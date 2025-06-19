@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plagiarism Check</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+body {
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Header untuk teks dan logo */
+.header {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    padding: 10px 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+/* Gaya untuk logo */
+.logo {
+    height: 60px;
+    margin-right: 10px;
+}
+
+/* Container dengan efek shadow dan warna lebih soft */
+.container {
+    max-width: 800px;
+    width: 100%;
+    margin: 80px auto 40px;
+    padding: 35px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: all 0.4s ease;
+}
+
+.container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Input file lebih rapat */
+.form-control {
+    max-width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 2px solid rgba(26, 42, 108, 0.1);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.form-control:focus {
+    border-color: #1a2a6c;
+    box-shadow: 0 0 0 0.2rem rgba(26, 42, 108, 0.25);
+    background: white;
+}
+
+/* Judul lebih kecil dan rapat */
+h2 {
+    text-align: center;
+    color: #1a2a6c;
+    font-weight: 700;
+    margin-bottom: 25px;
+    font-size: 2rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Label lebih jelas */
+.form-label {
+    font-weight: 600;
+    color: #1a2a6c;
+    margin-bottom: 10px;
+    display: inline-block;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Tombol dengan warna kuning */
+.btn-primary {
+    background: linear-gradient(45deg, #fdbb2d, #b21f1f);
+    border: none;
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    transition: all 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.btn-primary:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: 0.5s;
+}
+
+.btn-primary:hover:before {
+    left: 100%;
+}
+
+.loading {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #F4C542;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.btn-primary:hover {
+    background: linear-gradient(45deg, #b21f1f, #1a2a6c);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(178, 31, 31, 0.3);
+}
+
+/* Peringatan lebih kecil */
+.alert {
+    text-align: center;
+    font-size: 16px;
+    padding: 8px;
+}
+
+/* Container chart lebih rapat */
+.chart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+/* Warna chart lebih soft */
+canvas {
+    max-width: 180px;
+    margin-bottom: 5px;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="container">
+        <h2 class="d-flex align-items-center justify-content-center mb-4">
+            <img src="{{ url_for('static', filename='favicon.png') }}" alt="Favicon" width="40" class="me-2">
+            <span>Plagiarism Checker</span>
+        </h2>
+        
+        <form action="/" method="post" enctype="multipart/form-data" id="compareForm" class="needs-validation" novalidate>
+            <div class="mb-4">
+                <label for="file" class="form-label d-flex align-items-center">
+                    <i class="fas fa-file-upload me-2"></i>Unggah File
+                </label>
+                <div class="input-group">
+                    <input type="file" class="form-control" name="file" id="fileInput" required accept=".pdf,.docx">
+                    <span class="input-group-text"><i class="fas fa-file-pdf text-primary"></i></span>
+                </div>
+                <div class="form-text text-muted">Format yang didukung: PDF, DOCX (Max. 16MB)</div>
+                <div id="errorMessage" class="alert alert-danger mt-2" style="display: none;"></div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100" id="compareButton">
+                <i class="fas fa-search me-2"></i>
+                <span id="buttonText">Periksa Plagiarisme</span>
+            </button>
+        </form>
+
+        {% if similarity is not none %}
+    <div class="result-container mt-4">
+        <div class="chart-container mb-2">
+            <canvas id="resultPieChart" style="max-width:140px;"></canvas>
+            <canvas id="resultLineChart" style="max-width:180px; margin-top:10px;"></canvas>
+        </div>
+        <div class="result-details p-1 rounded-3 bg-light">
+            <div class="row">
+                <div class="col-6 text-center">
+                    <div class="result-item ai">
+                        <i class="fas fa-robot mb-2"></i>
+                        <h4>AI-generated</h4>
+                        <div class="percentage">{{ similarity|round(2) }}%</div>
+                        {% if similarity > 70 %}
+                        <div class="alert alert-warning mt-2 p-1" style="font-size:12px;">Teks ini kemungkinan besar dihasilkan oleh AI.</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-6 text-center">
+                    <div class="result-item human">
+                        <i class="fas fa-user mb-2"></i>
+                        <h4>Human-generated</h4>
+                        <div class="percentage">{{ (100 - similarity)|round(2) }}%</div>
+                        {% if similarity < 30 %}
+                        <div class="alert alert-success mt-2 p-1" style="font-size:12px;">Teks ini kemungkinan besar ditulis manusia.</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2 text-muted" style="font-size:13px;">
+                <b>Referensi Deteksi:</b> <a href="https://copyleaks.com/" target="_blank">Copyleaks</a>, <a href="https://quillbot.com/plagiarism-checker" target="_blank">QuillBot</a>
+            </div>
+            <div class="mt-1 alert alert-info p-1" style="font-size:12px;">
+                <b>Edukasi:</b> Selalu gunakan sitasi yang benar dan pahami perbedaan antara plagiarisme AI dan manusia. Hasil deteksi ini bersifat indikatif dan sebaiknya dikaji ulang secara manual.
+            </div>
+        </div>
+    </div>
+{% endif %}
+    </div>
+
+    <div class="header">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+        <span>Plagiarism Chek</span>
+    </div>
+
+
+    <script>
+        $(document).ready(function() {
+            {% if similarity is not none %}
+            // PIE CHART
+            var ctxPie = document.getElementById('resultPieChart').getContext('2d');
+            new Chart(ctxPie, {
+                type: 'pie',
+                data: {
+                    labels: ['AI-generated', 'Human-generated'],
+                    datasets: [{
+                        data: [{{ similarity|round(2) }}, {{ (100-similarity)|round(2) }}],
+                        backgroundColor: [
+                            'rgba(178, 31, 31, 0.8)',
+                            'rgba(26, 42, 108, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(178, 31, 31, 1)',
+                            'rgba(26, 42, 108, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+            // LINE CHART
+            var ctxLine = document.getElementById('resultLineChart').getContext('2d');
+            new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['AI', 'Human'],
+                    datasets: [{
+                        label: 'Persentase',
+                        data: [{{ similarity|round(2) }}, {{ (100-similarity)|round(2) }}],
+                        fill: false,
+                        borderColor: 'rgba(253, 187, 45, 1)',
+                        backgroundColor: 'rgba(253, 187, 45, 0.5)',
+                        tension: 0.4,
+                        pointBackgroundColor: [
+                            'rgba(178, 31, 31, 1)',
+                            'rgba(26, 42, 108, 1)'
+                        ],
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20,
+                                color: '#1a2a6c',
+                                font: { size: 10 }
+                            },
+                            grid: { display: false }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#1a2a6c',
+                                font: { size: 10 }
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            {% endif %}
+            // Form validation
+            $('#compareForm').on('submit', function(e) {
+                const fileInput = $('#fileInput')[0];
+                const file = fileInput.files[0];
+                
+                if (!file) {
+                    e.preventDefault();
+                    $('#errorMessage').text('Silakan pilih file terlebih dahulu.').show();
+                    return false;
+                }
+
+                const maxSize = 16 * 1024 * 1024; // 16MB
+                if (file.size > maxSize) {
+                    e.preventDefault();
+                    $('#errorMessage').text('Ukuran file tidak boleh lebih dari 16MB.').show();
+                    return false;
+                }
+
+                const fileType = file.name.split('.').pop().toLowerCase();
+                if (!['pdf', 'docx'].includes(fileType)) {
+                    e.preventDefault();
+                    $('#errorMessage').text('Format file tidak didukung. Gunakan PDF atau DOCX.').show();
+                    return false;
+                }
+
+                // Show loading spinner
+                $('.loading').css('display', 'flex');
+                $('#compareButton').prop('disabled', true);
+                $('#buttonText').html('<i class="fas fa-spinner fa-spin me-2"></i>Sedang Memproses...');
+                
+                return true;
+            });
+
+            // File input change handler
+            $('#fileInput').on('change', function() {
+                $('#errorMessage').hide();
+            });
+        });
+    </script>
+
+    <style>
+        .result-container {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    margin-top: 8px;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.result-details {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+}
+
+.result-item {
+    padding: 4px;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    margin: 1px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 5px;
+}
+
+.result-item:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(26, 42, 108, 0.1), rgba(178, 31, 31, 0.1));
+    transform: translateY(100%);
+    transition: transform 0.4s ease;
+    z-index: -1;
+}
+
+.result-item:hover:before {
+    transform: translateY(0);
+}
+
+.result-item:hover {
+    transform: translateY(-5px);
+}
+
+.result-item i {
+    font-size: 1.2rem;
+    background: linear-gradient(45deg, #1a2a6c, #b21f1f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 2px;
+}
+
+.result-item h4 {
+    color: #1a2a6c;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 2px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+}
+
+.result-item .percentage {
+    font-size: 1.2rem;
+    font-weight: bold;
+    background: linear-gradient(45deg, #1a2a6c, #b21f1f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-top: 1px;
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+        .result-details {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .result-item {
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .result-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .result-item i {
+            font-size: 2rem;
+            color: #F4C542;
+        }
+
+        .result-item h4 {
+            color: #333;
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+
+        .result-item .percentage {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #F4C542;
+        }
+
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 250px;
+            width: 250px;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function() {
+            {% if similarity is not none %}
+                const ctx = document.getElementById('resultChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['AI-generated', 'Human-generated'],
+                        datasets: [{
+                            data: [{{ similarity|round(2) }}, {{ (100 - similarity)|round(2) }}],
+                            backgroundColor: ['#F4C542', '#4A90E2'],
+                            borderColor: 'white',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.label + ': ' + context.raw + '%';
+                                    }
+                                }
+                            }
+                        },
+                        animation: {
+                            animateScale: true,
+                            animateRotate: true
+                        }
+                    }
+                });
+            {% endif %}
+        });
+
+            function showError(message) {
+                $("#errorMessage").text(message).fadeIn();
+                setTimeout(function() {
+                    $("#errorMessage").fadeOut();
+                }, 5000);
+            }
+
+            {% if similarity is not none %}
+            let ctx = document.getElementById("resultChart").getContext("2d");
+            new Chart(ctx, {
+                type: "doughnut",
+                data: {
+                    labels: ["AI-generated", "Human-generated"],
+                    datasets: [{
+                        data: [{{ similarity|round(2) }}, {{ (100 - similarity)|round(2) }}],
+                        backgroundColor: ["#ff6384", "#36a2eb"],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            {% endif %}
+        });
+
+       
+
+    var similarity = {{ similarity | default(0) }};
+    var classification = "{{ classification | default('N/A') }}";
+
+    var ctx = document.getElementById("resultChart").getContext("2d");
+    var chart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: ["Plagiarism (%)", "Original (%)"],
+            datasets: [{
+                data: [similarity, 100 - similarity],
+                backgroundColor: ["red", "blue"]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false  // Biarkan diagram fleksibel
+        }
+    });
+
+    document.getElementById("aiResult").innerText = "AI Classification: " + classification;
+    </script>
+</body>
+</html>
