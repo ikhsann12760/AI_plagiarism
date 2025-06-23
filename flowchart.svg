@@ -1,0 +1,112 @@
+<svg width="800" height="1200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .box { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; }
+      .decision { fill: #fff3e0; stroke: #f57c00; stroke-width: 2; }
+      .process { fill: #e8f5e8; stroke: #388e3c; stroke-width: 2; }
+      .start-end { fill: #fce4ec; stroke: #c2185b; stroke-width: 2; }
+      .text { font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+      .arrow { stroke: #333; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+  </defs>
+  
+  <!-- START -->
+  <ellipse cx="400" cy="50" rx="80" ry="30" class="start-end"/>
+  <text x="400" y="55" class="text">START</text>
+  
+  <!-- User mengakses web -->
+  <rect x="320" y="100" width="160" height="40" class="box"/>
+  <text x="400" y="125" class="text">User mengakses web</text>
+  
+  <!-- Tampilkan halaman upload -->
+  <rect x="300" y="170" width="200" height="40" class="box"/>
+  <text x="400" y="195" class="text">Tampilkan halaman upload</text>
+  
+  <!-- User upload file? -->
+  <polygon points="400,240 480,270 400,300 320,270" class="decision"/>
+  <text x="400" y="275" class="text">User upload file?</text>
+  
+  <!-- Validasi file -->
+  <polygon points="400,330 480,360 400,390 320,360" class="decision"/>
+  <text x="400" y="365" class="text">File valid?</text>
+  <text x="400" y="375" class="text">(PDF/DOCX)</text>
+  
+  <!-- Error handling -->
+  <rect x="550" y="340" width="120" height="40" class="box"/>
+  <text x="610" y="365" class="text">Tampilkan error</text>
+  
+  <!-- Simpan file -->
+  <rect x="320" y="420" width="160" height="40" class="box"/>
+  <text x="400" y="445" class="text">Simpan file sementara</text>
+  
+  <!-- Ekstraksi teks -->
+  <rect x="300" y="490" width="200" height="40" class="box"/>
+  <text x="400" y="515" class="text">Ekstraksi teks dari file</text>
+  
+  <!-- Teks berhasil? -->
+  <polygon points="400,560 480,590 400,620 320,590" class="decision"/>
+  <text x="400" y="595" class="text">Teks berhasil</text>
+  <text x="400" y="605" class="text">diekstrak?</text>
+  
+  <!-- Preprocessing -->
+  <rect x="300" y="650" width="200" height="40" class="box"/>
+  <text x="400" y="675" class="text">Preprocessing teks</text>
+  
+  <!-- Deteksi Plagiarisme -->
+  <rect x="280" y="720" width="240" height="40" class="process"/>
+  <text x="400" y="745" class="text">Deteksi plagiarisme (cosine similarity)</text>
+  
+  <!-- Deteksi AI -->
+  <rect x="280" y="790" width="240" height="40" class="process"/>
+  <text x="400" y="815" class="text">Deteksi AI (Sapling.ai API)</text>
+  
+  <!-- Simpan hasil -->
+  <rect x="320" y="860" width="160" height="40" class="box"/>
+  <text x="400" y="885" class="text">Simpan hasil ke session</text>
+  
+  <!-- Hapus file -->
+  <rect x="320" y="930" width="160" height="40" class="box"/>
+  <text x="400" y="955" class="text">Hapus file sementara</text>
+  
+  <!-- Tampilkan hasil -->
+  <rect x="300" y="1000" width="200" height="40" class="box"/>
+  <text x="400" y="1025" class="text">Tampilkan hasil ke user</text>
+  
+  <!-- END -->
+  <ellipse cx="400" cy="1100" rx="80" ry="30" class="start-end"/>
+  <text x="400" y="1105" class="text">END</text>
+  
+  <!-- Arrows -->
+  <line x1="400" y1="80" x2="400" y2="100" class="arrow"/>
+  <line x1="400" y1="140" x2="400" y2="170" class="arrow"/>
+  <line x1="400" y1="210" x2="400" y2="240" class="arrow"/>
+  <line x1="400" y1="300" x2="400" y2="330" class="arrow"/>
+  <line x1="480" y1="360" x2="550" y2="360" class="arrow"/>
+  <line x1="400" y1="390" x2="400" y2="420" class="arrow"/>
+  <line x1="400" y1="460" x2="400" y2="490" class="arrow"/>
+  <line x1="400" y1="530" x2="400" y2="560" class="arrow"/>
+  <line x1="480" y1="590" x2="610" y2="590" class="arrow"/>
+  <line x1="610" y1="590" x2="610" y2="380" class="arrow"/>
+  <line x1="400" y1="620" x2="400" y2="650" class="arrow"/>
+  <line x1="400" y1="690" x2="400" y2="720" class="arrow"/>
+  <line x1="400" y1="760" x2="400" y2="790" class="arrow"/>
+  <line x1="400" y1="830" x2="400" y2="860" class="arrow"/>
+  <line x1="400" y1="900" x2="400" y2="930" class="arrow"/>
+  <line x1="400" y1="970" x2="400" y2="1000" class="arrow"/>
+  <line x1="400" y1="1040" x2="400" y2="1070" class="arrow"/>
+  
+  <!-- Back to start arrow -->
+  <line x1="610" y1="380" x2="610" y2="120" class="arrow"/>
+  <line x1="610" y1="120" x2="500" y2="120" class="arrow"/>
+  
+  <!-- Labels -->
+  <text x="440" y="315" class="text" style="font-size: 10px;">Ya</text>
+  <text x="515" y="355" class="text" style="font-size: 10px;">Tidak</text>
+  <text x="440" y="405" class="text" style="font-size: 10px;">Ya</text>
+  <text x="515" y="585" class="text" style="font-size: 10px;">Tidak</text>
+  <text x="440" y="635" class="text" style="font-size: 10px;">Ya</text>
+  
+</svg>
